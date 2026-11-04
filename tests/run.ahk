@@ -191,6 +191,10 @@ s := MakeStrip(0.5, 0.5, 0.5)
 s.focusCol := 3
 Assert(s.RemoveWindow(103), "remove focused last column")
 AssertEq(s.focusCol, 2, "focus clamps to the new last column")
+s2 := MakeStrip(0.5, 0.5, 0.5)
+s2.focusCol := 2
+s2.RemoveWindow(101)   ; remove a column left of the focused one
+AssertEq(s2.columns[s2.focusCol].hwnds[1], 102, "focus stays on the same column")
 s.RemoveWindow(101), s.RemoveWindow(102)
 AssertEq(s.Count, 0, "strip empties")
 AssertEq(s.focusCol, 0, "no focus on an empty strip")

@@ -86,8 +86,13 @@ class Strip {
             return false
         col := this.columns[pos[1]]
         col.hwnds.RemoveAt(pos[2])
-        if !col.hwnds.Length
+        if !col.hwnds.Length {
             this.columns.RemoveAt(pos[1])
+            if pos[1] < this.focusCol
+                this.focusCol--          ; keep pointing at the same column
+        } else if pos[1] = this.focusCol && pos[2] < this.focusRow {
+            this.focusRow--              ; keep pointing at the same window
+        }
         if this.focusCol > this.Count
             this.focusCol := this.Count
         if this.focusCol {

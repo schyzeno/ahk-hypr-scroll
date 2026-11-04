@@ -57,8 +57,6 @@ class Events {
 }
 
 Events_WinEventProc(hook, event, hwnd, idObject, idChild, thread, time) {
-    global
-    Critical "Off"
     if idObject != OBJID_WINDOW || idChild != 0 || !hwnd
         return
     if hwnd = A_ScriptHwnd

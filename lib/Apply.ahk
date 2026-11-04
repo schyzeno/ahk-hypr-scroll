@@ -59,8 +59,10 @@ Apply_Rects(rects) {
             w := r.w + ins.l + ins.r, h := r.h + ins.t + ins.b
         }
         ; Restore from OS minimize/maximize state first; those fight SetWindowPos.
-        if WinGetMinMax("ahk_id " hwnd) != 0
-            try WinRestore("ahk_id " hwnd)
+        try {
+            if WinGetMinMax("ahk_id " hwnd) != 0
+                WinRestore("ahk_id " hwnd)
+        }
         targets[hwnd] := {x: x, y: y}
         if hdwp
             hdwp := DllCall("DeferWindowPos", "ptr", hdwp, "ptr", hwnd, "ptr", 0,

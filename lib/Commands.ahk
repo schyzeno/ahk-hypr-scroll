@@ -433,10 +433,14 @@ Cmd_SendToDesktop(n) {   ; n is 1-based
     if target >= Desktops.Count() || target = Desktops.Current()
         return
     found := Tiler.FindStrip(hwnd)
-    work := Apply_MonitorWork(hwnd)
     if found {
+        ; The strip key names the monitor (the window may be parked off-screen).
+        hmon := Integer(SubStr(found.key, InStr(found.key, ":") + 1))
+        work := Apply_MonitorWorkFromHandle(hmon)
         found.strip.RemoveWindow(hwnd)
         Tiler.Relayout(found.strip, work)
+    } else {
+        work := Apply_MonitorWork(hwnd)
     }
     if Desktops.MoveWindow(hwnd, target) && found {
         key := Tiler.Key(target, work.handle)
