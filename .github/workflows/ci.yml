@@ -12,8 +12,13 @@ jobs:
 
       - name: Install AutoHotkey v2
         shell: pwsh
+        env:
+          AHK_VERSION: 2.0.19
         run: |
-          Invoke-WebRequest "https://www.autohotkey.com/download/ahk-v2.zip" -OutFile ahk.zip
+          # autohotkey.com sits behind a JS challenge; the GitHub release is the
+          # same official zip and downloads cleanly on runners.
+          $url = "https://github.com/AutoHotkey/AutoHotkey/releases/download/v$env:AHK_VERSION/AutoHotkey_$env:AHK_VERSION.zip"
+          Invoke-WebRequest $url -OutFile ahk.zip
           Expand-Archive ahk.zip "$env:RUNNER_TEMP\ahk"
           $exe = Get-ChildItem -Recurse -Filter AutoHotkey64.exe "$env:RUNNER_TEMP\ahk" |
             Select-Object -First 1 -ExpandProperty FullName
