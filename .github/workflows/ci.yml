@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install AutoHotkey v2
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "https://www.autohotkey.com/download/ahk-v2.zip" -OutFile ahk.zip
+          Expand-Archive ahk.zip "$env:RUNNER_TEMP\ahk"
+          $exe = Get-ChildItem -Recurse -Filter AutoHotkey64.exe "$env:RUNNER_TEMP\ahk" |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $exe) { Write-Error "AutoHotkey64.exe not found in the zip"; exit 1 }
+          "AHK_EXE=$exe" >> $env:GITHUB_ENV
+          & $exe --version | Out-Host
+
+      - name: Unit tests (Strip, Layout, CheatSheet rows)
+        shell: pwsh
+        run: |
+          $out = & $env:AHK_EXE /ErrorStdOut tests\run.ahk 2>&1
+          $out | Out-Host
+          exit $LASTEXITCODE
+
+      - name: Load check (config + hotkey registration)
+        shell: pwsh
+        run: |
+          $out = & $env:AHK_EXE /ErrorStdOut main.ahk /validate 2>&1
+          $out | Out-Host
+          exit $LASTEXITCODE
