@@ -4,9 +4,14 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: windows-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +29,9 @@ jobs:
             Select-Object -First 1 -ExpandProperty FullName
           if (-not $exe) { Write-Error "AutoHotkey64.exe not found in the zip"; exit 1 }
           "AHK_EXE=$exe" >> $env:GITHUB_ENV
-          & $exe --version | Out-Host
+          # No --version switch exists: an unknown argument makes AutoHotkey
+          # show a "script not found" dialog and hang a headless runner.
+          Write-Host "Using $exe"
 
       - name: Unit tests (Strip, Layout, CheatSheet rows)
         shell: pwsh
